@@ -1,4 +1,4 @@
-.btn_main
+.btn
     &_animated
         animation: btnToUp 2s ease
         animation-fill-mode: backwards
@@ -11,16 +11,30 @@
         position: relative
         font-size: 16px
         border: none
-
-.btn_add 
-    position: absolute
-    .arrow 
-        border: solid black
-        border-width: 0 3px 3px 0
         display: inline-block
-        padding: 4px
+        cursor: pointer
+    &_main
+        font-size: 50px
+        padding: 2rem 5rem
+        transition: all 1s
+    &_not-active
+        background-color: #ccc
+        opacity: .5
+        cursor: not-allowed
+        pointer-events: none
 
-
-    .right 
-        transform: rotate(-45deg)
-        -webkit-transform: rotate(-45deg)
+.btn-text
+    &, &:link, &:visited
+        font-size: 12px
+        letter-spacing: .2rem
+        font-weight: 700
+        color: #6A5AE0
+        background-color: inherit
+        text-decoration: none
+        border: none
+        border-bottom: 3px #6A5AE0 solid
+        display: inline-block
+        transition: all .5s
+        position: absolute
+        top: 20px
+        left: 14px

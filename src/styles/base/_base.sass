@@ -5,14 +5,6 @@
 
 html
     font-size: 62.5%
-    // @include respond(tab-land)
-    //     font-size: 56.25%
-    // @include respond(tab-port)
-    //     font-size: 50%
-    // @include respond(phone)
-    //     font-size: 30%
-    // @include respond(big-screen)
-    //     font-size: 75%
 
 body
     background-color: #f7f7f7
@@ -21,7 +13,8 @@ body
     background-color: #f7f7f7
     height: 100vh
     display: flex
-    justify-content: center
+    flex-direction: column
+    justify-content: space-evenly
     align-items: center
 
 .show 
@@ -33,10 +26,3 @@ body
 .fade 
     animation-name: fade
     animation-duration: 1.5s
-
-@keyframes fade 
-    from 
-        opacity: 0.1
-
-    to 
-        opacity: 1
