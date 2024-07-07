@@ -4,6 +4,6 @@ import card from "./modules/card";
 
 document.addEventListener("DOMContentLoaded", () => {
     modal("[data-modal]", ".modal");
-    forms("form");
+    forms("form", ".modal");
     card(".card");
 });

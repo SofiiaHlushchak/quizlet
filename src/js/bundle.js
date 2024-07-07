@@ -12,30 +12,63 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-// const card = document.querySelector(".card");
-
-// card.addEventListener("click", function () {
-//     this.querySelector(".card__inner").classList.toggle("is-flipped");
-// });
-
 function card(cardSelector) {
     const card = document.querySelector(cardSelector);
+    const wordElement = document.querySelector("[data-word]");
+    const translateElement = document.querySelector("[data-translate]");
 
-    function showRandonWord(localStorage) {
-        const data = JSON.parse(localStorage);
-        const randomElement = data[Math.floor(Math.random() * data.length)];
-        const word = document.querySelector("[data-word]");
-        const translate = document.querySelector("[data-translate]");
+    let currentIndex = 0;
 
-        word.textContent = randomElement.word;
-        translate.textContent = randomElement.translate;
+    let words = JSON.parse(localStorage.getItem("words")) || [];
+
+    function getFilteredItems() {
+        let filteredWords = words.filter((word) => !word.remember);
+        return filteredWords;
     }
 
-    showRandonWord(localStorage.getItem("words"));
+    function displayWord(index) {
+        let filteredWords = getFilteredItems();
+
+        if (filteredWords.length === 0) {
+            localStorage.clear();
+            card.style.display = "none";
+            document.querySelector("[data-modal]").classList.add("btn_main");
+            document.querySelector(".card__controls").style.display = "none";
+            return;
+        }
+        document.querySelector("[data-modal]").classList.remove("btn_main");
+        wordElement.textContent = filteredWords[index].word;
+        translateElement.textContent = filteredWords[index].translate;
+    }
+
+    function nextWord() {
+        let filteredWords = getFilteredItems();
+        currentIndex++;
+        if (currentIndex >= filteredWords.length) {
+            currentIndex = 0;
+        }
+        card.querySelector(".card__inner").classList.remove("is-flipped");
+        displayWord(currentIndex);
+    }
 
     card.addEventListener("click", function () {
         this.querySelector(".card__inner").classList.toggle("is-flipped");
     });
+
+    document.querySelector("[data-remember]").addEventListener("click", () => {
+        let filteredWords = getFilteredItems();
+        filteredWords[currentIndex].remember = true;
+        localStorage.setItem("words", JSON.stringify(words));
+        nextWord();
+    });
+
+    document
+        .querySelector("[data-not-remember]")
+        .addEventListener("click", () => {
+            nextWord();
+        });
+
+    displayWord(currentIndex);
 }
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (card);
@@ -53,59 +86,61 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-function forms(formSelector) {
+/* harmony import */ var _modal__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./modal */ "./js/modules/modal.js");
+
+function forms(formSelector, modalSelector) {
     const forms = document.querySelectorAll(formSelector);
+    const addWordPairButton = document.querySelector("[data-add-new-word]");
 
     forms.forEach((item) => {
         bindPostData(item);
+        addNewInputs(item);
     });
+
+    function addNewInputs(form) {
+        addWordPairButton.addEventListener("click", () => {
+            const newWordPair = document.createElement("div");
+            newWordPair.classList.add("word-pair");
+            newWordPair.innerHTML = `
+                    <input type="text" name="word" placeholder="Введіть слово" class="modal__input">
+                    <input type="text" name="translate" placeholder="Введіть переклад" class="modal__input">
+                `;
+            form.insertBefore(
+                newWordPair,
+                form.querySelector(".btn")
+            );
+        });
+    }
 
     function bindPostData(form) {
         form.addEventListener("submit", (e) => {
             e.preventDefault();
-            let wordElement = document.querySelector("[name='word']");
-            let translateElement = document.querySelector("[name='translate']");
 
-            let newWordObj = {
-                word: wordElement.value,
-                translate: translateElement.value,
-            };
+            let newWords = [];
+
+            form.querySelectorAll(".word-pair").forEach((item) => {
+                let wordElement = item.querySelector("[name='word']");
+                let translateElement =
+                    document.querySelector("[name='translate']");
+
+                newWords.push({
+                    word: wordElement.value,
+                    translate: translateElement.value,
+                    remember: false,
+                });
+            });
 
             let existingWords = localStorage.getItem("words");
             let arrOfExistingWords = existingWords
                 ? JSON.parse(existingWords)
                 : [];
 
-            arrOfExistingWords.push(newWordObj);
+            arrOfExistingWords.push(...newWords);
 
             localStorage.setItem("words", JSON.stringify(arrOfExistingWords));
-
-            // const stringifiedObj = JSON.stringify(obj);
-
-            // localStorage.setItem("words", stringifiedObj);
-
-            // const statusMessage = document.createElement("img");
-            // statusMessage.src = message.loading;
-            // statusMessage.style.cssText = `
-            //     display: block;
-            //     margin: 0 auto;
-            // `;
-
-            // form.insertAdjacentElement("afterend", statusMessage);
-
-            // const formData = new FormData(form);
-
-            // const json = JSON.stringify(Object.fromEntries(formData.entries()));
-
-            // postData("http://localhost:3000/requests", json)
-            //     .then((data) => {
-            //         console.log(data);
-            //         showThanksModal(message.success);
-            //         form.reset();
-            //         statusMessage.remove();
-            //     })
-            //     .catch(() => showThanksModal(message.failure))
-            //     .finally(() => form.reset());
+            form.reset();
+            (0,_modal__WEBPACK_IMPORTED_MODULE_0__.closeModal)(modalSelector);
+            window.location.reload();
         });
     }
 }
@@ -132,6 +167,8 @@ const openModal = (modalSelector) => {
     modal.classList.add("show");
     modal.classList.remove("hide");
     document.body.style.overflow = "hidden";
+    document.querySelector("[data-modal]").classList.remove("btn_main");
+    document.querySelector("[data-modal]").classList.add("btn_not-active");
 };
 
 const closeModal = (modalSelector) => {
@@ -140,6 +177,8 @@ const closeModal = (modalSelector) => {
     modal.classList.add("hide");
     modal.classList.remove("show");
     document.body.style.overflow = "";
+    document.querySelector("[data-modal]").classList.add("btn_main");
+    document.querySelector("[data-modal]").classList.remove("btn_not-active");
 };
 
 function modal(triggerSelector, modalSelector) {
@@ -237,7 +276,7 @@ __webpack_require__.r(__webpack_exports__);
 
 document.addEventListener("DOMContentLoaded", () => {
     (0,_modules_modal__WEBPACK_IMPORTED_MODULE_0__["default"])("[data-modal]", ".modal");
-    (0,_modules_form__WEBPACK_IMPORTED_MODULE_1__["default"])("form");
+    (0,_modules_form__WEBPACK_IMPORTED_MODULE_1__["default"])("form", ".modal");
     (0,_modules_card__WEBPACK_IMPORTED_MODULE_2__["default"])(".card");
 });
 

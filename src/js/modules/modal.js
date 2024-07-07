@@ -4,6 +4,8 @@ const openModal = (modalSelector) => {
     modal.classList.add("show");
     modal.classList.remove("hide");
     document.body.style.overflow = "hidden";
+    document.querySelector("[data-modal]").classList.remove("btn_main");
+    document.querySelector("[data-modal]").classList.add("btn_not-active");
 };
 
 const closeModal = (modalSelector) => {
@@ -12,6 +14,8 @@ const closeModal = (modalSelector) => {
     modal.classList.add("hide");
     modal.classList.remove("show");
     document.body.style.overflow = "";
+    document.querySelector("[data-modal]").classList.add("btn_main");
+    document.querySelector("[data-modal]").classList.remove("btn_not-active");
 };
 
 function modal(triggerSelector, modalSelector) {
